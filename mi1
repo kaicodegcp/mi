@@ -1,0 +1,62 @@
+#!/bin/bash
+# Rebuild /docker LV as /data/1 using all available space in its VG
+set -euo pipefail
+
+MNT_OLD="/docker"
+MNT_NEW="/data/1"
+
+echo "=== Detecting current device for $MNT_OLD ==="
+if ! SRC=$(findmnt -n -o SOURCE "$MNT_OLD" 2>/dev/null); then
+  echo "ERROR: $MNT_OLD is not mounted. Aborting."
+  exit 1
+fi
+echo "  Found: $SRC"
+
+# Normalize device path, e.g. /dev/mapper/datavg-lv_docker → datavg/lv_docker
+if [[ "$SRC" == /dev/mapper/* ]]; then
+  VG_LV=$(lvs --noheadings -o vg_name,lv_name "$SRC" | awk '{print $1"/"$2}')
+elif [[ "$SRC" == /dev/*/* ]]; then
+  VG_LV=${SRC#/dev/}
+else
+  echo "ERROR: Unexpected device format: $SRC"
+  exit 1
+fi
+
+VG=${VG_LV%/*}
+LV_OLD=${VG_LV#*/}
+
+echo "  VG: $VG"
+echo "  LV: $LV_OLD"
+
+echo "=== Unmounting $MNT_OLD ==="
+umount "$MNT_OLD"
+
+echo "=== Removing /docker entry from /etc/fstab (if present) ==="
+cp -p /etc/fstab /etc/fstab.bak.$(date +%s)
+grep -v " $MNT_OLD " /etc/fstab > /etc/fstab.tmp
+mv /etc/fstab.tmp /etc/fstab
+
+echo "=== Removing old LV $VG/$LV_OLD ==="
+lvremove -y "/dev/$VG/$LV_OLD"
+
+echo "=== Creating new LV lv_data1 using ALL free space in $VG ==="
+LV_NEW="lv_data1"
+lvcreate -y -n "$LV_NEW" -l 100%FREE "$VG"
+
+DEV_NEW="/dev/$VG/$LV_NEW"
+
+echo "=== Creating XFS filesystem on $DEV_NEW ==="
+mkfs.xfs -f "$DEV_NEW"
+
+echo "=== Creating mountpoint $MNT_NEW ==="
+mkdir -p "$MNT_NEW"
+
+echo "=== Adding $MNT_NEW to /etc/fstab ==="
+UUID=$(blkid -s UUID -o value "$DEV_NEW")
+echo "UUID=$UUID  $MNT_NEW  xfs  defaults  0 0" >> /etc/fstab
+
+echo "=== Mounting all filesystems ==="
+mount -a
+
+echo "=== Done. New filesystem: ==="
+df -h "$MNT_NEW"
