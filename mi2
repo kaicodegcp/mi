@@ -41,3 +41,18 @@ BEGIN {
 }' "$H107" > "$OUT"
 
 echo "New delta image:version lines written to: $OUT"
+
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+INPUT="delta_new.txt"
+OUTPUT="delta_versions_comma.txt"
+
+# Extract the version (last field after :) and join into one comma-separated line
+awk -F: '{print $NF}' "$INPUT" \
+    | sed 's/^[ \t]*//;s/[ \t]*$//' \
+    | paste -sd ',' - > "$OUTPUT"
+
+echo "✔ Comma-separated version list written to: $OUTPUT"
+
