@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# input files
+H107="h107.txt"        # all 330 image:version lines
+LIST53="53.txt"        # 53 image:version lines
+BASE="base_list.txt"   # comma-separated version numbers
+OUT="delta_new.txt"    # output file with NEW image:version lines
+
+# temp file to hold all "known" (old) version numbers
+KNOWN_VERSIONS="$(mktemp)"
+trap 'rm -f "$KNOWN_VERSIONS"' EXIT
+
+# 1) Collect ALL old versions (base_list + 53.txt) into one file
+{
+  # from base_list.txt: comma-separated -> one per line
+  tr ',' '\n' < "$BASE"
+
+  # from 53.txt: take only the tag after last colon in image:tag
+  awk -F: '{print $NF}' "$LIST53"
+} | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed '/^$/d' \
+  | sort -u > "$KNOWN_VERSIONS"
+
+# 2) Read known versions into awk and filter h107.txt
+awk -F: -v known_file="$KNOWN_VERSIONS" '
+BEGIN {
+  # load known versions into array
+  while ((getline v < known_file) > 0) {
+    gsub(/^[ \t]+|[ \t]+$/, "", v)
+    if (v != "") known[v] = 1
+  }
+  close(known_file)
+}
+{
+  ver = $NF                      # version = text after last colon
+  gsub(/^[ \t]+|[ \t]+$/, "", ver)
+  if (!(ver in known)) {
+    # version not seen before -> NEW
+    print $0
+  }
+}' "$H107" > "$OUT"
+
+echo "New delta image:version lines written to: $OUT"
