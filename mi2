@@ -56,3 +56,21 @@ awk -F: '{print $NF}' "$INPUT" \
 
 echo "✔ Comma-separated version list written to: $OUTPUT"
 
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+INPUT="delta_versions_comma.txt"
+OUTPUT="delta_versions_unique.txt"
+
+# Split by commas → sort unique → join back into single comma-separated line
+tr ',' '\n' < "$INPUT" \
+    | sed 's/^[ \t]*//;s/[ \t]*$//' \
+    | sed '/^$/d' \
+    | sort -u \
+    | paste -sd ',' - \
+    > "$OUTPUT"
+
+echo "✔ Unique comma-separated versions written to: $OUTPUT"
+
+
