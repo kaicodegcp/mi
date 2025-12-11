@@ -74,3 +74,47 @@ tr ',' '\n' < "$INPUT" \
 echo "✔ Unique comma-separated versions written to: $OUTPUT"
 
 
+
+
+#!/usr/bin/env bash
+set -euo pipefail
+
+IMAGES="h107.txt"                 # 330 image:version lines
+VERSIONS_CSV="delta_versions_unique.txt"
+OUTPUT="delta_images_unique.txt"  # final image:version mapping
+
+# Temp file for versions (one per line)
+VERSIONS_LIST="$(mktemp)"
+trap 'rm -f "$VERSIONS_LIST"' EXIT
+
+# 1) Turn comma-separated versions into one-per-line list
+tr ',' '\n' < "$VERSIONS_CSV" \
+  | sed 's/^[ \t]*//;s/[ \t]*$//' \
+  | sed '/^$/d' \
+  > "$VERSIONS_LIST"
+
+# 2) Build map: version -> first image:version line from h107.txt
+#    Then, for each version in versions list, print its mapped line.
+awk -F: '
+NR==FNR {
+    # First pass: read h107.txt
+    ver = $NF
+    gsub(/^[ \t]+|[ \t]+$/, "", ver)
+    # keep only the FIRST image line for each version
+    if (!(ver in first)) {
+        first[ver] = $0
+    }
+    next
+}
+{
+    # Second pass: read versions_list
+    v = $0
+    gsub(/^[ \t]+|[ \t]+$/, "", v)
+    if (v in first) {
+        print first[v]
+    }
+}' "$IMAGES" "$VERSIONS_LIST" > "$OUTPUT"
+
+echo "✔ Single image:version per unique version written to: $OUTPUT"
+
+
