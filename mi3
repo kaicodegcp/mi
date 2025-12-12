@@ -1,0 +1,42 @@
+Description
+
+CDS 1.5.5-SP1 Image Deployment to Docker Artifactory:
+This week, the EAP Strategic Solutions team successfully deployed the latest Cloudera Data Services (CDS) 1.5.5-SP1 container images (version 1.5.5-h107) to the internal Docker Artifactory. This action ensures that the latest certified Cloudera OpenShift container images are now readily available for downstream CDS deployments across environments.
+
+The images were validated, correctly tagged, and ingested into the Citi-hosted secure Docker registry to align with enterprise container distribution and audit standards.
+
+Key Achievements
+
+Successfully onboarded CDS 1.5.5-SP1 image set (tagged 1.5.5-h107) into Docker Artifactory.
+
+Verified availability of all essential CDS components including:
+
+Spark Operator
+
+CDE Runtime Images
+
+Vault/Certs helper images
+
+CML base containers (if applicable)
+
+Maintained consistent tagging conventions and metadata alignment for downstream automation compatibility.
+
+Ensured image signatures and TLS trust validation passed for secure OpenShift cluster ingestion.
+
+Benefits to the Team
+
+Enables up-to-date, secure deployments of Cloudera Data Services using latest features and fixes from Cloudera 1.5.5-SP1 release.
+
+Removes bottlenecks for environment teams by having pre-loaded and trusted CDS images in internal Docker repository.
+
+Provides consistent, version-controlled access to validated images across all tiers (DEV, UAT, PROD).
+
+Accelerates deployment timelines for new CDS instances on OpenShift by eliminating external fetch dependencies.
+
+Next Steps
+
+Coordinate with CDS deployment teams to schedule rollout of 1.5.5-SP1 to staging and production clusters.
+
+Monitor for any platform-specific patch releases or updated base images for future Artifactory ingestion.
+
+Automate future image ingestion and signature validation pipelines for ongoing CDS releases.
