@@ -1,0 +1,34 @@
+Weekly Accomplishment – Week Ending Dec 20, 2025
+Automated Certificate Deployment via Starfleet Ansible for Secure Application Connectivity
+
+The EAP Big Data Engineering team successfully completed automation and deployment of updated .pem certificate chains (DEV, LAB, UAT, PROD) using the certs.parcel delivery method and Starfleet's Ansible Unix portal. This process ensures secure TLS connections for all application-managed nodes leveraging Hive Beeline and Impala JDBC/ODBC drivers.
+
+This effort modernized and standardized the certificate management lifecycle by integrating cert updates into the parcel deployment automation, providing a centralized and compliant approach across all SDLC tiers.
+
+Key Achievements:
+
+Built and packaged the latest .pem certificate chains for all environments into a single certs.parcel.
+
+Executed automated rollout using Starfleet Ansible playbook: Cti Rhel Eapbigdata Bdeng Vm Maintenance App Managed Parcels Deploy.
+
+Validated updated cert trust for Hive Beeline and Impala client connectivity on application-managed VMs.
+
+Enabled consistent TLS-based authentication across environments by using Citi Internal CA-signed certificates.
+
+Benefits to the Team:
+
+Ensures compliance and secure job execution for data apps using Hive and Impala.
+
+Avoids manual certificate propagation by using automated Ansible parcel workflows.
+
+Enhances auditability and change control through standardized Starfleet job runs.
+
+Reduces future operational burden by packaging certs for easy redeployment when renewed.
+
+Next Steps:
+
+Schedule routine certificate checks and automate triggers for upcoming expiry alerts.
+
+Integrate this parcel deployment into CDS upgrade flows and pipeline automation.
+
+Extend automation to support self-validating cert deployment with post-checks for service restarts.
