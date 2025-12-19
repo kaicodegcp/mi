@@ -1,0 +1,35 @@
+Deploying Latest Microsoft PKI-Signed Certs to certs.parcel Across SDLC
+Description
+
+The EAP Engineering team successfully updated all SDLC environments with the latest Microsoft PKI-signed certificate chain files by integrating renewed .pem certs into the existing certs.parcel. These certificates were securely sourced from Citi’s internal Microsoft PKI portal
+ and deployed using pre-existing Starfleet parcel automation.
+
+This effort ensures all edge and CDS nodes consuming secure HiveServer2, Beeline, and other TLS-dependent services are aligned with the most recent internal certificate authority trust chain.
+
+Key Achievements
+
+Downloaded and verified Microsoft PKI-signed .pem chain files for CitiInternal CA.
+
+Rebuilt the certs.parcel with updated chain for use in Beeline/Hive/Impala secured connections.
+
+Leveraged existing parcel deployment automation to push the updated certs.parcel across all SDLC edge and CDS hosts.
+
+Confirmed trust alignment by verifying TLS handshake success using Beeline CLI.
+
+Benefits to the Team
+
+Keeps CDS and Cloudera-based services in compliance with Citi's internal PKI lifecycle.
+
+Eliminates risk of expired certificate usage by preemptively rotating CA chain.
+
+Utilizes trusted and automated deployment workflow, avoiding manual errors.
+
+Ensures consistent TLS validation across environments for all JDBC/ODBC clients.
+
+Next Steps
+
+Monitor upcoming cert expirations and automate .pem polling from PKI portal.
+
+Extend this automation to include Java truststore regeneration as needed.
+
+Notify app teams of cert rotation to enable downstream trust chain alignment.
